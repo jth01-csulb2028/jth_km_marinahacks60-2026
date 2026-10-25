@@ -1,8 +1,26 @@
-## KEVIN
-- Im panicking dawg
-- wya bro
-- Python projet not sure what we're gonna be yet
-- TODO: Choose project idea
+# C++ Visuali(C)er
+*get it? visuali(C)er?*
 
-### Project Ideas
-- c++ visual interpreter
+a python program dedicated to visualizing beginner C++ code
+
+## What it supports
+
+- Header files
+    - [ ] Classes
+    - [ ] Methods
+    - [ ] Variables
+    - [ ] Macros for defining the header file
+    - [ ] Macros **OUTSIDE** of decleration
+    - [ ] Pragma declaration
+
+- Cpp files
+    - [ ] Header dependencies
+    - [ ] Classes
+    - [ ] Methods
+    - [ ] Variables
+    - [ ] Namespaces
+    - [ ] Macros
+
+### Some examples of what aren't suppored
+
+- namespaces
