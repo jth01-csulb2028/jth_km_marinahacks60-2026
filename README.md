@@ -3,6 +3,8 @@
 
 a python program dedicated to visualizing beginner C++ code
 
+inspired by [Python Tutor](https://pythontutor.com/visualize.html#mode=display)
+
 ## What it supports
 
 - Header files

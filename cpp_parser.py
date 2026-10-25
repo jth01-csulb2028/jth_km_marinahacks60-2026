@@ -177,7 +177,8 @@ def adapt_from_header(header_filepath, cpp_object: Cpp):
     return cpp_object
 
 
-syntax_arguments = {"#include": 1, "//": -1}
+# syntax_arguments = {"#include": 1}
+known_return_types = {"void", "int", "std::string", "float", "char", "long"}
 
 
 
@@ -185,6 +186,8 @@ def read_cpp(filepath):
     temp_path = Path(filepath)
     ourcpp = Cpp(temp_path.name)
     code = []
+    context = "cpp"
+    current_context = ourcpp
 
     with open(filepath, "r") as file:
         code = file.readlines()
@@ -192,7 +195,64 @@ def read_cpp(filepath):
     for raw_line in code:
         stripped_line = raw_line.strip()
         line = stripped_line.split()
+
+        if len(line) == 0: continue # empty line; skip
+        if line[0][0:2] == "//": continue # comment line; skip
+        if line[0] == "#include":
+            ourcpp.declare_dependency(line[1])
+            if line[1][0] == '<':
+                print("Add Library "+line[1]) # add library
+                continue
+            elif line[1][-3:-1] == ".h":
+                adapt_from_header(filepath+line[1][1:-1], ourcpp) # add header items
+                continue
+            else:
+                print("Add unknown dependency") # probably add a cpp, cannot support at this time
+                continue
+        if line[0] == "using": continue # namespace most likely, cant support at this time
+
+        # not empty, or comment, or import/include, or namespace
+
+        if line[0] in known_return_types:
+            # we're declaring something, get context and understand if its a method or var
+            if "(" in line[1]:
+                # Method
+                endofname = line[1].find("(") # index
+                beginningofname = 0
+                tempfind = line[1].find("::")
+                if tempfind != -1:
+                    # declaration from header or earlier context
+                    beginningofname = tempfind+2
+                method_name = line[1][beginningofname:endofname]
+                does_method_already_exist = False
+                for i,v in enumerate(current_context.methods):
+                    if v.name == method_name:
+                        # we found an existing method, skip line bc we have arguments, get code inside
+                        does_method_already_exist = True
+                        break
+                if does_method_already_exist == False:
+                    current_context.declare_method(  ) # lets say false by default
+            else:
+                # Variable
+                variable_name = ""
+                variable_value = 0
+                if "=" in line[1]:
+                    variable_name = line[1][0:variable_name.find("=")]
+                    if line[1][-1] == "=":
+                        # 'type variable_name= value'
+                        variable_value = line[2]
+                    else:
+                        # 'type variable_name=value'
+                        variable_value = line[1][ (line[1].find("=")+1): ]
+                new_variable = CppVariable(variable_name, line[0])
+                new_variable.value = variable_value
+                current_context.declare_variable( CppVariable(variable_name, line[0]), False )
+
+        # for item in line:
+
         
+
+
 
 
 
